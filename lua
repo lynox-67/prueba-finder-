@@ -1,69 +1,84 @@
 -- =========================
--- UI LINOX PET FINDER
+-- LINOX HUB - XENO SAFE UI
 -- =========================
 
+print("LINOX: CARGANDO UI...")
+
+repeat task.wait() until game:IsLoaded()
+task.wait(5)
+
+local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
-local PlayerGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+local CoreGui = game:GetService("CoreGui")
+
+local LocalPlayer = Players.LocalPlayer
+
+-- limpiar si existe
+pcall(function()
+    CoreGui:FindFirstChild("LINOX_UI"):Destroy()
+end)
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "LINOX_UI"
 gui.ResetOnSpawn = false
-gui.Parent = PlayerGui
+gui.IgnoreGuiInset = true
 
-local main = Instance.new("Frame", gui)
-main.Size = UDim2.fromScale(0.25, 0.35)
-main.Position = UDim2.fromScale(0.37, 0.3)
-main.BackgroundColor3 = Color3.fromRGB(35,35,35)
+-- 🔥 CLAVE PARA XENO
+gui.Parent = CoreGui
+
+local main = Instance.new("Frame")
+main.Parent = gui
+main.Size = UDim2.new(0, 360, 0, 260)
+main.Position = UDim2.new(0.5, -180, 0.5, -130)
+main.BackgroundColor3 = Color3.fromRGB(40,40,40)
 main.BorderSizePixel = 0
 main.Visible = true
 
-local corner = Instance.new("UICorner", main)
-corner.CornerRadius = UDim.new(0,16)
+Instance.new("UICorner", main).CornerRadius = UDim.new(0,16)
 
--- Título
-local title = Instance.new("TextLabel", main)
-title.Size = UDim2.new(1,0,0.15,0)
+local title = Instance.new("TextLabel")
+title.Parent = main
+title.Size = UDim2.new(1,0,0,50)
 title.BackgroundTransparency = 1
 title.Text = "LINOX Pet Finder"
-title.TextColor3 = Color3.fromRGB(220,220,220)
 title.Font = Enum.Font.GothamBold
-title.TextScaled = true
+title.TextSize = 22
+title.TextColor3 = Color3.fromRGB(230,230,230)
 
--- Input
-local box = Instance.new("TextBox", main)
+local info = Instance.new("TextLabel")
+info.Parent = main
+info.Position = UDim2.new(0,20,0,60)
+info.Size = UDim2.new(1,-40,0,40)
+info.BackgroundTransparency = 1
+info.TextWrapped = true
+info.Text = "RightCtrl = Mostrar / Ocultar"
+info.Font = Enum.Font.Gotham
+info.TextSize = 14
+info.TextColor3 = Color3.fromRGB(180,180,180)
+
+local box = Instance.new("TextBox")
+box.Parent = main
+box.Position = UDim2.new(0,20,0,110)
+box.Size = UDim2.new(1,-40,0,40)
 box.PlaceholderText = "Ej: 10 = 10M | 5000 = 5B"
-box.Size = UDim2.new(0.9,0,0.18,0)
-box.Position = UDim2.new(0.05,0,0.2,0)
-box.BackgroundColor3 = Color3.fromRGB(50,50,50)
+box.BackgroundColor3 = Color3.fromRGB(60,60,60)
 box.TextColor3 = Color3.new(1,1,1)
 box.Font = Enum.Font.Gotham
-box.TextScaled = true
+box.TextSize = 16
+Instance.new("UICorner", box)
 
-Instance.new("UICorner", box).CornerRadius = UDim.new(0,10)
+local btn = Instance.new("TextButton")
+btn.Parent = main
+btn.Position = UDim2.new(0,20,0,170)
+btn.Size = UDim2.new(1,-40,0,50)
+btn.Text = "AUTO JOIN / PET FINDER"
+btn.Font = Enum.Font.GothamBold
+btn.TextSize = 16
+btn.TextColor3 = Color3.new(1,1,1)
+btn.BackgroundColor3 = Color3.fromRGB(90,90,90)
+Instance.new("UICorner", btn)
 
--- Botón Pet Finder
-local petBtn = Instance.new("TextButton", main)
-petBtn.Text = "PET FINDER"
-petBtn.Size = UDim2.new(0.9,0,0.18,0)
-petBtn.Position = UDim2.new(0.05,0,0.45,0)
-petBtn.BackgroundColor3 = Color3.fromRGB(70,70,70)
-petBtn.TextColor3 = Color3.new(1,1,1)
-petBtn.Font = Enum.Font.GothamBold
-petBtn.TextScaled = true
-Instance.new("UICorner", petBtn)
-
--- Botón Auto Join
-local joinBtn = Instance.new("TextButton", main)
-joinBtn.Text = "AUTO JOIN"
-joinBtn.Size = UDim2.new(0.9,0,0.18,0)
-joinBtn.Position = UDim2.new(0.05,0,0.68,0)
-joinBtn.BackgroundColor3 = Color3.fromRGB(90,90,90)
-joinBtn.TextColor3 = Color3.new(1,1,1)
-joinBtn.Font = Enum.Font.GothamBold
-joinBtn.TextScaled = true
-Instance.new("UICorner", joinBtn)
-
--- Keybind RightCtrl
+-- Keybind
 UIS.InputBegan:Connect(function(i,gp)
     if gp then return end
     if i.KeyCode == Enum.KeyCode.RightControl then
@@ -71,4 +86,4 @@ UIS.InputBegan:Connect(function(i,gp)
     end
 end)
 
-print("LINOX UI CARGADA")
+print("LINOX: UI MOSTRADA CORRECTAMENTE")

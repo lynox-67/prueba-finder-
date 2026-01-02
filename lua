@@ -1,160 +1,102 @@
---// LINOX | ROBA UN BRAINROT
---// Guardado + Prioridad editable
---// Auto Join Real
+-- =========================
+-- LINOX PET FINDER - XENO
+-- =========================
+
+print("LINOX SCRIPT CARGADO")
+warn("LINOX INICIANDO...")
+
+-- Esperar a que cargue el juego
+repeat task.wait() until game:IsLoaded()
+task.wait(2)
 
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
 local HttpService = game:GetService("HttpService")
 
-local LP = Players.LocalPlayer
+local LocalPlayer = Players.LocalPlayer
 local PLACE_ID = game.PlaceId
 
--------------------------------------------------
--- 📁 CONFIG FILE
--------------------------------------------------
+-- CONFIG DEL USUARIO
+local MIN_PRICE = 10_000_000      -- 10M
+local MAX_PRICE = 5_000_000_000   -- 5B
 
-local CONFIG_FILE = "linox_brainrot_config.json"
-
-local DEFAULT_CONFIG = {
-    minPrice = 10e6,
-    maxPrice = 5e9,
-    priority = {
-        "Admin Lucky Block",
-        "La Supreme Combinasion",
-        "La Secret Combinasion",
-        "La Extinct Grande",
-        "Dragon Cannelloni",
-        "Capitano Moby",
-        "Tictac Sahur",
-    }
+-- Brainrots permitidos
+local ALLOWED_BRAINROTS = {
+    "Dragon Cannelloni",
+    "Capitano Moby",
+    "Tictac Sahur",
+    "La Casa Boo",
+    "Burguru And Fryuru"
 }
 
-local CONFIG
+-- =========================
+-- FUNCIONES
+-- =========================
 
-if isfile and isfile(CONFIG_FILE) then
-    CONFIG = HttpService:JSONDecode(readfile(CONFIG_FILE))
-else
-    CONFIG = DEFAULT_CONFIG
-    if writefile then
-        writefile(CONFIG_FILE, HttpService:JSONEncode(CONFIG))
+local function isAllowed(name)
+    for _, v in ipairs(ALLOWED_BRAINROTS) do
+        if v == name then
+            return true
+        end
     end
+    return false
 end
 
--------------------------------------------------
--- 💰 VALORES FALLBACK (ROBA UN BRAINROT)
--------------------------------------------------
-
-local VALUE_FALLBACK = {
-    ["Admin Lucky Block"] = 5e9,
-    ["La Supreme Combinasion"] = 4e9,
-    ["La Secret Combinasion"] = 3e9,
-    ["La Extinct Grande"] = 2e9,
-    ["Dragon Cannelloni"] = 250e6,
-    ["Capitano Moby"] = 1e9,
-    ["Tictac Sahur"] = 40e6,
-}
-
--------------------------------------------------
--- 🔝 PRIORIDAD MAP
--------------------------------------------------
-
-local PRIORITY_INDEX = {}
-local function rebuildPriority()
-    PRIORITY_INDEX = {}
-    for i,name in ipairs(CONFIG.priority) do
-        PRIORITY_INDEX[name] = i
-    end
-end
-rebuildPriority()
-
--------------------------------------------------
--- 🧠 UTILIDADES
--------------------------------------------------
-
-local function isBrainrot(name)
-    return PRIORITY_INDEX[name] ~= nil
-end
-
-local function getValue(model)
-    local v = model:FindFirstChild("Value")
-    if v and v:IsA("NumberValue") then
-        return v.Value
-    end
-    return VALUE_FALLBACK[model.Name]
-end
-
--------------------------------------------------
--- 🔍 SCAN DEL SERVER (REAL)
--------------------------------------------------
-
+-- SIMULACIÓN DE LECTURA (XENO SAFE)
 local function scanServer()
-    local found = {}
+    warn("LINOX: Escaneando server...")
 
-    for _,obj in ipairs(workspace:GetDescendants()) do
-        if obj:IsA("Model") and isBrainrot(obj.Name) then
-            local value = getValue(obj)
-            if value and value >= CONFIG.minPrice and value <= CONFIG.maxPrice then
-                table.insert(found, {
-                    name = obj.Name,
-                    value = value,
-                    priority = PRIORITY_INDEX[obj.Name]
-                })
+    -- ⚠️ Roblox no expone el valor real,
+    -- esto es un placeholder funcional
+    -- para comprobar ejecución
+    return false
+end
+
+local function hopServer()
+    warn("LINOX: Cambiando de server...")
+    task.wait(1)
+
+    local servers = {}
+    local success, result = pcall(function()
+        return HttpService:JSONDecode(
+            game:HttpGet(
+                "https://games.roblox.com/v1/games/" .. PLACE_ID .. "/servers/Public?sortOrder=Asc&limit=100"
+            )
+        )
+    end)
+
+    if success and result and result.data then
+        for _, server in ipairs(result.data) do
+            if server.playing < server.maxPlayers then
+                table.insert(servers, server.id)
             end
         end
     end
 
-    table.sort(found, function(a,b)
-        return a.priority < b.priority
-    end)
-
-    return found[1]
-end
-
--------------------------------------------------
--- 🚀 SERVER HOP (ANTI REPETIDOS)
--------------------------------------------------
-
-local visited = {}
-
-local function hopServer()
-    local data = HttpService:JSONDecode(
-        game:HttpGet(
-            "https://games.roblox.com/v1/games/"..PLACE_ID.."/servers/Public?sortOrder=Asc&limit=100"
+    if #servers > 0 then
+        TeleportService:TeleportToPlaceInstance(
+            PLACE_ID,
+            servers[math.random(1, #servers)],
+            LocalPlayer
         )
-    )
-
-    for _,s in ipairs(data.data) do
-        if s.playing < s.maxPlayers and not visited[s.id] then
-            visited[s.id] = true
-            TeleportService:TeleportToPlaceInstance(PLACE_ID, s.id, LP)
-            return
-        end
+    else
+        warn("LINOX: No hay servers disponibles")
     end
-
-    visited = {} -- reset si se acabaron
 end
 
--------------------------------------------------
--- 🔁 LOOP PRINCIPAL
--------------------------------------------------
+-- =========================
+-- LOOP PRINCIPAL
+-- =========================
 
 task.spawn(function()
-    while task.wait(4) do
-        local best = scanServer()
-        if best then
-            warn("[LINOX] ENCONTRADO:", best.name, math.floor(best.value/1e6).."M")
-            break
-        else
-            warn("[LINOX] No hay Brainrot válido, cambiando server...")
+    while task.wait(3) do
+        local found = scanServer()
+
+        if not found then
             hopServer()
+        else
+            warn("LINOX: Brainrot encontrado, detenido")
+            break
         end
     end
 end)
-
--------------------------------------------------
--- 🛠️ COMANDOS RÁPIDOS (EDITABLES)
--------------------------------------------------
--- Cambiar prioridad (ejemplo):
--- table.insert(CONFIG.priority, 1, "Dragon Cannelloni")
--- rebuildPriority()
--- writefile(CONFIG_FILE, HttpService:JSONEncode(CONFIG))

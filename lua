@@ -1,102 +1,74 @@
 -- =========================
--- LINOX PET FINDER - XENO
+-- UI LINOX PET FINDER
 -- =========================
 
-print("LINOX SCRIPT CARGADO")
-warn("LINOX INICIANDO...")
+local UIS = game:GetService("UserInputService")
+local PlayerGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
 
--- Esperar a que cargue el juego
-repeat task.wait() until game:IsLoaded()
-task.wait(2)
+local gui = Instance.new("ScreenGui")
+gui.Name = "LINOX_UI"
+gui.ResetOnSpawn = false
+gui.Parent = PlayerGui
 
-local Players = game:GetService("Players")
-local TeleportService = game:GetService("TeleportService")
-local HttpService = game:GetService("HttpService")
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.fromScale(0.25, 0.35)
+main.Position = UDim2.fromScale(0.37, 0.3)
+main.BackgroundColor3 = Color3.fromRGB(35,35,35)
+main.BorderSizePixel = 0
+main.Visible = true
 
-local LocalPlayer = Players.LocalPlayer
-local PLACE_ID = game.PlaceId
+local corner = Instance.new("UICorner", main)
+corner.CornerRadius = UDim.new(0,16)
 
--- CONFIG DEL USUARIO
-local MIN_PRICE = 10_000_000      -- 10M
-local MAX_PRICE = 5_000_000_000   -- 5B
+-- Título
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1,0,0.15,0)
+title.BackgroundTransparency = 1
+title.Text = "LINOX Pet Finder"
+title.TextColor3 = Color3.fromRGB(220,220,220)
+title.Font = Enum.Font.GothamBold
+title.TextScaled = true
 
--- Brainrots permitidos
-local ALLOWED_BRAINROTS = {
-    "Dragon Cannelloni",
-    "Capitano Moby",
-    "Tictac Sahur",
-    "La Casa Boo",
-    "Burguru And Fryuru"
-}
+-- Input
+local box = Instance.new("TextBox", main)
+box.PlaceholderText = "Ej: 10 = 10M | 5000 = 5B"
+box.Size = UDim2.new(0.9,0,0.18,0)
+box.Position = UDim2.new(0.05,0,0.2,0)
+box.BackgroundColor3 = Color3.fromRGB(50,50,50)
+box.TextColor3 = Color3.new(1,1,1)
+box.Font = Enum.Font.Gotham
+box.TextScaled = true
 
--- =========================
--- FUNCIONES
--- =========================
+Instance.new("UICorner", box).CornerRadius = UDim.new(0,10)
 
-local function isAllowed(name)
-    for _, v in ipairs(ALLOWED_BRAINROTS) do
-        if v == name then
-            return true
-        end
-    end
-    return false
-end
+-- Botón Pet Finder
+local petBtn = Instance.new("TextButton", main)
+petBtn.Text = "PET FINDER"
+petBtn.Size = UDim2.new(0.9,0,0.18,0)
+petBtn.Position = UDim2.new(0.05,0,0.45,0)
+petBtn.BackgroundColor3 = Color3.fromRGB(70,70,70)
+petBtn.TextColor3 = Color3.new(1,1,1)
+petBtn.Font = Enum.Font.GothamBold
+petBtn.TextScaled = true
+Instance.new("UICorner", petBtn)
 
--- SIMULACIÓN DE LECTURA (XENO SAFE)
-local function scanServer()
-    warn("LINOX: Escaneando server...")
+-- Botón Auto Join
+local joinBtn = Instance.new("TextButton", main)
+joinBtn.Text = "AUTO JOIN"
+joinBtn.Size = UDim2.new(0.9,0,0.18,0)
+joinBtn.Position = UDim2.new(0.05,0,0.68,0)
+joinBtn.BackgroundColor3 = Color3.fromRGB(90,90,90)
+joinBtn.TextColor3 = Color3.new(1,1,1)
+joinBtn.Font = Enum.Font.GothamBold
+joinBtn.TextScaled = true
+Instance.new("UICorner", joinBtn)
 
-    -- ⚠️ Roblox no expone el valor real,
-    -- esto es un placeholder funcional
-    -- para comprobar ejecución
-    return false
-end
-
-local function hopServer()
-    warn("LINOX: Cambiando de server...")
-    task.wait(1)
-
-    local servers = {}
-    local success, result = pcall(function()
-        return HttpService:JSONDecode(
-            game:HttpGet(
-                "https://games.roblox.com/v1/games/" .. PLACE_ID .. "/servers/Public?sortOrder=Asc&limit=100"
-            )
-        )
-    end)
-
-    if success and result and result.data then
-        for _, server in ipairs(result.data) do
-            if server.playing < server.maxPlayers then
-                table.insert(servers, server.id)
-            end
-        end
-    end
-
-    if #servers > 0 then
-        TeleportService:TeleportToPlaceInstance(
-            PLACE_ID,
-            servers[math.random(1, #servers)],
-            LocalPlayer
-        )
-    else
-        warn("LINOX: No hay servers disponibles")
-    end
-end
-
--- =========================
--- LOOP PRINCIPAL
--- =========================
-
-task.spawn(function()
-    while task.wait(3) do
-        local found = scanServer()
-
-        if not found then
-            hopServer()
-        else
-            warn("LINOX: Brainrot encontrado, detenido")
-            break
-        end
+-- Keybind RightCtrl
+UIS.InputBegan:Connect(function(i,gp)
+    if gp then return end
+    if i.KeyCode == Enum.KeyCode.RightControl then
+        main.Visible = not main.Visible
     end
 end)
+
+print("LINOX UI CARGADA")

